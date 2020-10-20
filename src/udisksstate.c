@@ -2283,6 +2283,12 @@ udisks_state_clear_modules (UDisksState *state)
 
   /* just remove the file entirely */
   path = get_state_file_path (UDISKS_STATE_FILE_MODULES);
+
+  if (g_getenv ("SNAP_DATA") != NULL)
+  {
+    path = g_strdup_printf ("%s/%s", g_getenv ("SNAP_DATA"), key);
+  }
+
   if (g_unlink (path))
     {
       if (errno != ENOENT)
@@ -2375,6 +2381,11 @@ udisks_state_get (UDisksState           *state,
 
   path = get_state_file_path (key);
 
+  if (g_getenv ("SNAP_DATA") != NULL)
+  {
+    path = g_strdup_printf ("%s/%s", g_getenv ("SNAP_DATA"), key);
+  }
+
   /* see if it's already in the cache */
   ret = g_hash_table_lookup (state->cache, path);
   if (ret != NULL)
@@ -2446,6 +2457,12 @@ udisks_state_set (UDisksState          *state,
   g_variant_store (normalized, data);
 
   path = get_state_file_path (key);
+
+  if (g_getenv ("SNAP_DATA") != NULL)
+  {
+    path = g_strdup_printf ("%s/%s", g_getenv ("SNAP_DATA"), key);
+  }
+
   g_hash_table_insert (state->cache, g_strdup (path), g_variant_ref (value));
 
   if (!g_file_set_contents (path,
