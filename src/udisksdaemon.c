@@ -333,14 +333,18 @@ udisks_daemon_constructed (GObject *object)
         }
     }
 
-  if (!g_file_test (PACKAGE_LOCALSTATE_DIR "/lib/udisks2", G_FILE_TEST_IS_DIR))
+  /* If we're running in a snap environment just keep the state in $SNAP_DATA.
+   * otherwise we need to create a traditional state dir */
+  if (g_getenv ("SNAP_DATA") == NULL)
+  {
+    if (!g_file_test (PACKAGE_LOCALSTATE_DIR "/lib/udisks2", G_FILE_TEST_IS_DIR))
     {
       if (g_mkdir_with_parents (PACKAGE_LOCALSTATE_DIR "/lib/udisks2", 0700) != 0)
-        {
-          udisks_critical ("Error creating directory %s: %m", PACKAGE_LOCALSTATE_DIR "/lib/udisks2");
-        }
+      {
+        udisks_critical ("Error creating directory %s: %m", PACKAGE_LOCALSTATE_DIR "/lib/udisks2");
+      }
     }
-
+  }
 
   if (! daemon->uninstalled)
     {
